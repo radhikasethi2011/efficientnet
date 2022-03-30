@@ -4,8 +4,4 @@
 
 !python3 compare.py --device cpu
 
-
-create a folder "input" and add 1 image: 'image_1.jpg'
-
-
 ![image](https://user-images.githubusercontent.com/44310177/160855276-440f0ac3-e6cf-4741-9948-6eec17ccf90f.png)
