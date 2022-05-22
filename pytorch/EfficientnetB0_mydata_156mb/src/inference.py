@@ -5,62 +5,51 @@ import glob as glob
 import os
 from model import build_model
 from torchvision import transforms
-from google.colab.patches import cv2_imshow
-# Constants.
-DATA_PATH = '../input/test_images'
+from datasets import get_datasets, get_data_loaders
+from utils import save_model, save_plots
+
+DATA_PATH = '/content/Testing'
 IMAGE_SIZE = 224
 DEVICE = 'cpu'
 # Class names.
-class_names = ['glioma', 'meningioma', 'no_tumor', 'pituitary']
 
+dataset_train, dataset_test, dataset_valid, dataset_classes = get_datasets()
+print(f"[INFO]: Number of testing images: {len(dataset_test)}")
+print(f"[INFO]: Class names: {dataset_classes}\n")
+# Load the training and validation data loaders.
+train_loader, test_loader, valid_loader = get_data_loaders(dataset_train, dataset_test, dataset_valid)
+dataiter = iter(test_loader)
+images, labels = dataiter.next()
+print("##############################")
+print("image shape ",images.shape)
+print("label shape ", labels.shape)
 # Load the trained model.
 model = build_model(pretrained=False, fine_tune=False, num_classes=4)
-checkpoint = torch.load('../outputs/model.pth', map_location=DEVICE)
+checkpoint = torch.load('/content/efficientnet/pytorch/EfficientnetB0_mydata_156mb/outputs/model.pth', map_location=DEVICE)
 print('Loading trained model weights...')
 model.load_state_dict(checkpoint['model_state_dict'])
 
 # Get all the test image paths.
-all_image_paths = glob.glob(f"{DATA_PATH}/*")
-# Iterate over all the images and do forward pass.
-for image_path in all_image_paths:
-    # Get the ground truth class name from the image path.
-    gt_class_name = image_path.split(os.path.sep)[-1].split('.')[0]
-    # Read the image and create a copy.
-    image = cv2.imread(image_path)
-    orig_image = image.copy()
+correct_count, all_count = 0, 0
+for images,labels in test_loader:
+  for i in range(len(labels)):
+  
+    images, labels = images.to(DEVICE), labels.to(DEVICE)
+    img = images[i].view(1,3, 224, 224)
+    #img = torch.unsqueeze()
+    with torch.no_grad():
+        logps = model(img)
+
     
-    # Preprocess the image
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    transform = transforms.Compose([
-        transforms.ToPILImage(),
-        transforms.Resize((IMAGE_SIZE, IMAGE_SIZE)),
-        transforms.ToTensor(),
-        transforms.Normalize(
-            mean=[0.485, 0.456, 0.406],
-            std=[0.229, 0.224, 0.225]
-        )
-    ])
-    image = transform(image)
-    image = torch.unsqueeze(image, 0)
-    image = image.to(DEVICE)
-    
-    # Forward pass throught the image.
-    outputs = model(image)
-    outputs = outputs.detach().numpy()
-    pred_class_name = class_names[np.argmax(outputs[0])]
-    print(f"GT: {gt_class_name}, Pred: {pred_class_name.lower()}")
-    # Annotate the image with ground truth.
-    cv2.putText(
-        orig_image, f"GT: {gt_class_name}",
-        (10, 25), cv2.FONT_HERSHEY_SIMPLEX,
-        0.8, (0, 255, 0), 2, lineType=cv2.LINE_AA
-    )
-    # Annotate the image with prediction.
-    cv2.putText(
-        orig_image, f"Pred: {pred_class_name.lower()}",
-        (10, 55), cv2.FONT_HERSHEY_SIMPLEX,
-        0.8, (100, 100, 225), 2, lineType=cv2.LINE_AA
-    ) 
-    cv2_imshow(orig_image)
-    cv2.waitKey(0)
-    cv2.imwrite(f"../outputs/{gt_class_name}.png", orig_image)
+    ps = torch.exp(logps)
+    probab = list(ps.cpu()[0])
+    pred_label = probab.index(max(probab))
+    true_label = labels.cpu()[i]
+    print("true label: ", true_label)
+    print("pred label: ", pred_label)
+    if(true_label == pred_label):
+      correct_count += 1
+    all_count += 1
+
+print("Number Of Images Tested =", all_count)
+print("\nModel Accuracy =", (correct_count/all_count))
