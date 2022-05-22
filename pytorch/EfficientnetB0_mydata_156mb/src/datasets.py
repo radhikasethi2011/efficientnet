@@ -12,10 +12,10 @@ NUM_WORKERS = 4 # Number of parallel processes for data preparation.
 def get_train_transform(IMAGE_SIZE):
     train_transform = transforms.Compose([
         transforms.Resize((IMAGE_SIZE, IMAGE_SIZE)),
-        transforms.RandomHorizontalFlip(p=0.5),
-        transforms.RandomVerticalFlip(p=0.5),
-        transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 5)),
-        transforms.RandomAdjustSharpness(sharpness_factor=2, p=0.5),
+        #transforms.RandomHorizontalFlip(p=0.5),
+        #transforms.RandomVerticalFlip(p=0.5),
+        #transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 5)),
+        #transforms.RandomAdjustSharpness(sharpness_factor=2, p=0.5),
         transforms.ToTensor(),
         transforms.Normalize(
             mean=[0.485, 0.456, 0.406],
