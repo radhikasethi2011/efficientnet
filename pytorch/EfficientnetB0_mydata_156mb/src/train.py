@@ -80,16 +80,16 @@ def validate(model, testloader, criterion):
 
 if __name__ == '__main__':
     # Load the training and validation datasets.
-    dataset_train, dataset_valid, dataset_classes = get_datasets()
+    dataset_train, dataset_test, dataset_valid, dataset_classes = get_datasets()
     print(f"[INFO]: Number of training images: {len(dataset_train)}")
     print(f"[INFO]: Number of validation images: {len(dataset_valid)}")
     print(f"[INFO]: Class names: {dataset_classes}\n")
     # Load the training and validation data loaders.
-    train_loader, valid_loader = get_data_loaders(dataset_train, dataset_valid)
+    train_loader, test_loader, valid_loader = get_data_loaders(dataset_train, dataset_test, dataset_valid)
     # Learning_parameters. 
     lr = args['learning_rate']
     epochs = args['epochs']
-    device = ('cuda' if torch.cuda.is_available() else 'cpu')
+    device = ('cuda' if torch.cuda.is_available() else 'gpu')
     print(f"Computation device: {device}")
     print(f"Learning rate: {lr}")
     print(f"Epochs to train for: {epochs}\n")
