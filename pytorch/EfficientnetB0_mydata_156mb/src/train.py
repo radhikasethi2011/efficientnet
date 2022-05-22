@@ -95,7 +95,7 @@ if __name__ == '__main__':
     print(f"Epochs to train for: {epochs}\n")
     model = build_model(
         pretrained=True,
-        fine_tune=True, 
+        fine_tune=False, 
         num_classes=len(dataset_classes)
     ).to(device)
     
