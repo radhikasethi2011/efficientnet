@@ -1,8 +1,9 @@
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
+import torch
 
-TRAIN_DIR = '../input/training'
-VALID_DIR = '../input/validation'
+TRAIN_DIR = '/content/Training'
+TEST_DIR = '/content/Testing'
 IMAGE_SIZE = 224 # Image size of resize when applying transforms.
 BATCH_SIZE = 32 
 NUM_WORKERS = 4 # Number of parallel processes for data preparation.
@@ -22,9 +23,9 @@ def get_train_transform(IMAGE_SIZE):
             )
     ])
     return train_transform
-# Validation transforms
-def get_valid_transform(IMAGE_SIZE):
-    valid_transform = transforms.Compose([
+# testing transforms
+def get_test_transform(IMAGE_SIZE):
+    test_transform = transforms.Compose([
         transforms.Resize((IMAGE_SIZE, IMAGE_SIZE)),
         transforms.ToTensor(),
         transforms.Normalize(
@@ -32,7 +33,7 @@ def get_valid_transform(IMAGE_SIZE):
             std=[0.229, 0.224, 0.225]
             )
     ])
-    return valid_transform
+    return test_transform
 
 
 def get_datasets():
@@ -45,25 +46,31 @@ def get_datasets():
         TRAIN_DIR, 
         transform=(get_train_transform(IMAGE_SIZE))
     )
-    dataset_valid = datasets.ImageFolder(
-        VALID_DIR, 
-        transform=(get_valid_transform(IMAGE_SIZE))
+    dataset_test1 = datasets.ImageFolder(
+        TEST_DIR, 
+        transform=(get_test_transform(IMAGE_SIZE))
     )
-    return dataset_train, dataset_valid, dataset_train.classes
+    dataset_test, dataset_val = torch.utils.data.random_split(dataset_test1, [918, 393])
+    return dataset_train, dataset_test, dataset_val, dataset_train.classes
     
-def get_data_loaders(dataset_train, dataset_valid):
+def get_data_loaders(dataset_train, dataset_test, dataset_valid):
     """
-    Prepares the training and validation data loaders.
+    Prepares the training and testing and validation data loaders.
     :param dataset_train: The training dataset.
+    :param dataset_test: The testing dataset.
     :param dataset_valid: The validation dataset.
-    Returns the training and validation data loaders.
+    Returns the training, testing and validation data loaders.
     """
     train_loader = DataLoader(
         dataset_train, batch_size=BATCH_SIZE, 
         shuffle=True, num_workers=NUM_WORKERS
     )
+    test_loader =  DataLoader(
+        dataset_test, batch_size=BATCH_SIZE, 
+        shuffle=False, num_workers=NUM_WORKERS
+    )
     valid_loader = DataLoader(
         dataset_valid, batch_size=BATCH_SIZE, 
         shuffle=False, num_workers=NUM_WORKERS
     )
-    return train_loader, valid_loader 
+    return train_loader, test_loader, valid_loader 
