@@ -27,7 +27,7 @@ criterion = nn.CrossEntropyLoss()
 
 
 model.eval()
-print('Validation')
+print('Testing')
 valid_running_loss = 0.0
 valid_running_correct = 0
 counter = 0
