@@ -2,8 +2,8 @@ from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 import torch
 
-TRAIN_DIR = '/content/Training'
-TEST_DIR = '/content/Testing'
+TRAIN_DIR = '/content/drive/MyDrive/Brain_tumor_detection/gaussian'
+TEST_DIR = '/content/drive/MyDrive/Brain_tumor_detection/brain_tumor_original_dataset/Testing'
 IMAGE_SIZE = 224 # Image size of resize when applying transforms.
 BATCH_SIZE = 32 
 NUM_WORKERS = 4 # Number of parallel processes for data preparation.
