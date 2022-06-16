@@ -10,7 +10,7 @@ from utils import save_model, save_plots
 from tqdm.auto import tqdm
 import torch.nn as nn
 
-DATA_PATH = '/content/Testing'
+DATA_PATH = '/content/drive/MyDrive/Brain_tumor_detection/brain_tumor_original_dataset/Testing'
 IMAGE_SIZE = 224
 device = 'cpu'
 DEVICE = 'cpu'
